@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { login } from "../service/api.service";
-import { setToken, getToken } from "../service/session.service";
+import { apiService } from "../service/api.service";
+import { sessionService } from "../service/session.service";
 
 interface ButtonProps {
 	text: string;
@@ -44,9 +44,10 @@ const Login = () => {
 	};
 
 	const handleLogIn = async () => {
-		const response = await login(username, password);
+		const response = await apiService.login(username, password);
 		if (response.status && response.status === 200) {
-			setToken(response.data);
+			sessionService.setToken(response.data);
+			sessionService.setUsername(username);
 			navigate("/");
 		}
 	};
