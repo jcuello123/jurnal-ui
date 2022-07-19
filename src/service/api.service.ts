@@ -36,6 +36,33 @@ const getLogs = async (offset: number, retryFunction: Function) => {
 	}
 };
 
+const saveLog = async (text: string, date: string, retryFunction: Function) => {
+	const reqBody = {
+		text,
+		date,
+		username: sessionService.getUsername(),
+	};
+
+	const options = {
+		headers: {
+			username: sessionService.getUsername(),
+			token: sessionService.getToken(),
+		},
+	};
+
+	try {
+		const response = await axios.post(
+			`${API_BASE_URL}/logs/save`,
+			reqBody,
+			options
+		);
+
+		return response.data;
+	} catch (error) {
+		await handleExpiredToken(error, retryFunction);
+	}
+};
+
 const renewToken = async () => {
 	const options = {
 		headers: {
@@ -65,4 +92,5 @@ const handleExpiredToken = async (error: any, retryFunction: Function) => {
 export const apiService = {
 	login,
 	getLogs,
+	saveLog,
 };
