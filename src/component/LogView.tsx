@@ -20,6 +20,7 @@ const LogView = () => {
 	};
 	const [currentLog, setCurrentLog] = useState<Log>(emptyLog);
 	const [index, setCurrentIndex] = useState(0);
+	const [hasMoreData, setHasMoreData] = useState(true);
 
 	useEffect(() => {
 		const token = sessionService.getToken();
@@ -32,7 +33,6 @@ const LogView = () => {
 
 		const fetchLogs = async () => {
 			const data: Log[] = (await apiService.getLogs(offset, fetchLogs)) || [];
-			console.log(data);
 
 			if (data.length === 0 || data[0].date !== emptyLog.date) {
 				data.unshift(emptyLog);
@@ -47,7 +47,25 @@ const LogView = () => {
 
 	useEffect(() => {
 		setCurrentLog(logs[index]);
+		if (index === logs.length - 1) {
+			setOffset(offset + 3);
+		}
 	}, [index]);
+
+	useEffect(() => {
+		const fetchLogs = async () => {
+			const data: Log[] = (await apiService.getLogs(offset, fetchLogs)) || [];
+
+			if (data.length > 0) {
+				setLogs(logs.concat(data));
+			} else {
+				setHasMoreData(false);
+			}
+		};
+		if (hasMoreData && offset > 0) {
+			fetchLogs();
+		}
+	}, [offset]);
 
 	const handlePreviousLog = () => {
 		if (index < logs.length - 1) {
@@ -73,21 +91,25 @@ const LogView = () => {
 					<p className="text-6xl">
 						{currentLog ? currentLog.date : emptyLog.date}
 					</p>
-					{currentLog && currentLog.date === moment().format("YYYY-MM-DD") && (
-						<textarea
-							className="text-center w-[800px] h-[400px] my-20 text-xl bg-[#282c34] resize-none outline-none"
-							defaultValue={currentLog ? currentLog.text : emptyLog.text}
-							onChange={() => {}}
-							autoFocus
-							maxLength={1000}
-							placeholder="Enter a log for today"
-						></textarea>
-					)}
-					{currentLog && currentLog.date !== moment().format("YYYY-MM-DD") && (
-						<div className="text-center w-[800px] h-[400px] my-20 text-xl">
-							<p>{currentLog.text ? currentLog.text : ""}</p>
-						</div>
-					)}
+					{currentLog &&
+						currentLog.date === moment().format("YYYY-MM-DD") &&
+						!currentLog.text && (
+							<textarea
+								className="text-center w-[800px] h-[400px] my-20 text-xl bg-[#282c34] resize-none outline-none"
+								defaultValue={currentLog ? currentLog.text : ""}
+								onChange={() => {}}
+								autoFocus
+								maxLength={1000}
+								placeholder="Enter a log for today"
+							></textarea>
+						)}
+					{currentLog &&
+						(currentLog.text ||
+							currentLog.date !== moment().format("YYYY-MM-DD")) && (
+							<div className="text-center w-[800px] h-[400px] my-20 text-xl">
+								<p>{currentLog.text ? currentLog.text : ""}</p>
+							</div>
+						)}
 				</div>
 			</div>
 			<div>
