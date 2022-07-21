@@ -63,6 +63,24 @@ const saveLog = async (text: string, date: string, retryFunction: Function) => {
 	}
 };
 
+const signUp = async (
+	username: string,
+	password: string,
+	retryFunction: Function
+) => {
+	try {
+		const reqBody = {
+			username,
+			password,
+		};
+
+		const response = await axios.post(`${API_BASE_URL}/signup`, reqBody);
+		return response.data;
+	} catch (error) {
+		handleExpiredToken(error, retryFunction);
+	}
+};
+
 const renewToken = async () => {
 	const options = {
 		headers: {
@@ -93,4 +111,5 @@ export const apiService = {
 	login,
 	getLogs,
 	saveLog,
+	signUp,
 };
