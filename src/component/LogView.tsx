@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiService } from "../service/api.service";
+import api from "../service/api.service";
 import { sessionService } from "../service/session.service";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import moment from "moment";
@@ -33,14 +33,20 @@ const LogView = () => {
 		}
 
 		const fetchLogs = async () => {
-			const data: Log[] = (await apiService.getLogs(offset, fetchLogs)) || [];
+			try {
+				const reqBody = { offset };
+				const response = await api.post("/logs", reqBody);
+				const data: Log[] = response.data || [];
 
-			if (data.length === 0 || data[0].date !== todaysLog.date) {
-				data.unshift(todaysLog);
+				if (data.length === 0 || data[0].date !== todaysLog.date) {
+					data.unshift(todaysLog);
+				}
+
+				setLogs(data);
+				setCurrentLog(data[0]);
+			} catch (error) {
+				console.log("Error fetching logs:", error);
 			}
-
-			setLogs(data);
-			setCurrentLog(data[0]);
 		};
 
 		fetchLogs();
@@ -55,12 +61,20 @@ const LogView = () => {
 
 	useEffect(() => {
 		const fetchLogs = async () => {
-			const data: Log[] = (await apiService.getLogs(offset, fetchLogs)) || [];
+			try {
+				const reqBody = { offset };
+				const response = await api.post("/logs", reqBody);
+				if (response.data) {
+					const data: Log[] = response.data;
 
-			if (data.length > 0) {
-				setLogs(logs.concat(data));
-			} else {
-				setHasMoreData(false);
+					if (data.length > 0) {
+						setLogs(logs.concat(data));
+					} else {
+						setHasMoreData(false);
+					}
+				}
+			} catch (error) {
+				console.log("Error fetching logs:", error);
 			}
 		};
 		if (hasMoreData && offset > 0) {
@@ -89,16 +103,22 @@ const LogView = () => {
 	};
 
 	const handleSaveLog = async () => {
-		const savedLog = await apiService.saveLog(
-			currentLog.text,
-			currentLog.date,
-			handleSaveLog
-		);
+		try {
+			const reqBody = {
+				text: currentLog.text,
+				date: currentLog.date,
+				username: sessionService.getUsername(),
+			};
 
-		if (savedLog) {
-			setCurrentLog(savedLog);
-			setOffset(0);
-			setHasMoreData(true);
+			const response = await api.post("/logs/save", reqBody);
+			if (response.data) {
+				const savedLog = response.data;
+				setCurrentLog(savedLog);
+				setOffset(0);
+				setHasMoreData(true);
+			}
+		} catch (error) {
+			console.log("Error saving log:", error);
 		}
 	};
 

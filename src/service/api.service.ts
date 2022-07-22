@@ -1,115 +1,53 @@
-import axios from "axios";
-import { sessionService } from "./session.service";
+import axios, { Axios } from "axios";
+import { sessionService } from "service/session.service";
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const api = axios.create({
+	baseURL: process.env.REACT_APP_BASE_URL || "http://localhost:8080",
+});
 
-const login = async (username: string, password: string) => {
-	try {
-		const response = await axios.post(`${API_BASE_URL}/login`, {
-			username,
-			password,
-		});
-		return response;
-	} catch (error) {
-		return error;
+api.interceptors.request.use((req) => {
+	req.headers = {
+		username: sessionService.getUsername(),
+		token: sessionService.getToken(),
+		"Content-Type": "application/json",
+		Accept: "application/json",
+	};
+
+	return req;
+});
+
+api.interceptors.response.use(
+	(res) => res,
+	async (err) => {
+		if (err.response?.status === 401) {
+			await handleExpiredToken();
+			try {
+				const response = await api.request(err.config);
+				return response;
+			} catch (error) {
+				console.log("Error retrying request:", error);
+			}
+		}
+		return err;
 	}
-};
+);
 
-const getLogs = async (offset: number, retryFunction: Function) => {
+const handleExpiredToken = async () => {
 	try {
-		const reqBody = {
-			offset,
-		};
-
 		const options = {
 			headers: {
 				username: sessionService.getUsername(),
 				token: sessionService.getToken(),
 			},
 		};
-
-		const response = await axios.post(`${API_BASE_URL}/logs`, reqBody, options);
-
-		return response.data;
-	} catch (error) {
-		await handleExpiredToken(error, retryFunction);
-	}
-};
-
-const saveLog = async (text: string, date: string, retryFunction: Function) => {
-	const reqBody = {
-		text,
-		date,
-		username: sessionService.getUsername(),
-	};
-
-	const options = {
-		headers: {
-			username: sessionService.getUsername(),
-			token: sessionService.getToken(),
-		},
-	};
-
-	try {
-		const response = await axios.post(
-			`${API_BASE_URL}/logs/save`,
-			reqBody,
-			options
-		);
-
-		return response.data;
-	} catch (error) {
-		await handleExpiredToken(error, retryFunction);
-	}
-};
-
-const signUp = async (
-	username: string,
-	password: string,
-	retryFunction: Function
-) => {
-	try {
-		const reqBody = {
-			username,
-			password,
-		};
-
-		const response = await axios.post(`${API_BASE_URL}/signup`, reqBody);
-		return response.data;
-	} catch (error) {
-		handleExpiredToken(error, retryFunction);
-	}
-};
-
-const renewToken = async () => {
-	const options = {
-		headers: {
-			username: sessionService.getUsername(),
-			token: sessionService.getToken(),
-		},
-	};
-
-	const response = await axios.post(`${API_BASE_URL}/token`, {}, options);
-	return response.data;
-};
-
-const handleExpiredToken = async (error: any, retryFunction: Function) => {
-	if (
-		error.response &&
-		error.response.status &&
-		error.response.status === 401
-	) {
-		const token = await renewToken();
-		if (token) {
+		const response = await api.post("/token", {}, options);
+		if (response.data) {
+			const token = response.data;
 			sessionService.setToken(token);
-			await retryFunction();
 		}
+	} catch (error) {
+		console.log("Error when attempting token refresh:", error);
 	}
 };
 
-export const apiService = {
-	login,
-	getLogs,
-	saveLog,
-	signUp,
-};
+export default api;

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { apiService } from "../service/api.service";
+import api from "../service/api.service";
 
 const Signup = () => {
 	const [username, setUsername] = useState("");
@@ -17,9 +17,17 @@ const Signup = () => {
 			return;
 		}
 
-		const user = await apiService.signUp(username, password, handleSignUp);
-		if (user) {
-			navigate("/login");
+		try {
+			const reqBody = {
+				username,
+				password,
+			};
+			const response = await api.post("/signup", reqBody);
+			if (response.data) {
+				navigate("/login");
+			}
+		} catch (error) {
+			console.log("Error signing up:", error);
 		}
 	};
 
