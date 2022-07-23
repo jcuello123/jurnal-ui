@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../service/api.service";
 import { sessionService } from "../service/session.service";
+import Modal, { ModalData } from "./Modal";
 
 interface ButtonProps {
 	text: string;
@@ -33,6 +34,12 @@ const Input = ({ type, placeholder, onChange }) => {
 const Login = () => {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
+	const [modalData, setModalData] = useState<ModalData>({
+		message: "",
+		success: false,
+		show: false,
+	});
+
 	const navigate = useNavigate();
 
 	const handleUsernameChange = (e) => {
@@ -50,39 +57,47 @@ const Login = () => {
 				password,
 			};
 			const response = await api.post("/login", reqBody);
-
-			sessionService.setToken(response.data);
-			sessionService.setUsername(username);
-			navigate("/");
+			if (response?.status === 200) {
+				sessionService.setToken(response.data);
+				sessionService.setUsername(username);
+				navigate("/");
+			}
 		} catch (error) {
-			console.log("Error logging in:", error);
+			setModalData({
+				message: "Error logging in.",
+				success: false,
+				show: true,
+			});
 		}
 	};
 
 	return (
-		<div
-			className="w-80 h-80 bg-violet-400 top-[50%] left-[50%] -translate-x-1/2
+		<>
+			<Modal modalData={modalData} setModalData={setModalData} />
+			<div
+				className="w-80 h-80 bg-violet-400 top-[50%] left-[50%] -translate-x-1/2
                        -translate-y-1/2 absolute rounded-lg"
-		>
-			<div className="flex flex-col justify-center items-center h-full gap-5">
-				<Input
-					type="text"
-					placeholder="Username"
-					onChange={handleUsernameChange}
-				/>
-				<Input
-					type="password"
-					placeholder="Password"
-					onChange={handlePasswordChange}
-				/>
-				<div className="flex flex-col gap-2">
-					<Button text="Log in" onClick={handleLogIn} />
-					<Link to="/signup">
-						<Button text="Sign up" />
-					</Link>
+			>
+				<div className="flex flex-col justify-center items-center h-full gap-5">
+					<Input
+						type="text"
+						placeholder="Username"
+						onChange={handleUsernameChange}
+					/>
+					<Input
+						type="password"
+						placeholder="Password"
+						onChange={handlePasswordChange}
+					/>
+					<div className="flex flex-col gap-2">
+						<Button text="Log in" onClick={handleLogIn} />
+						<Link to="/signup">
+							<Button text="Sign up" />
+						</Link>
+					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 };
 
