@@ -1,4 +1,4 @@
-import axios, { Axios } from "axios";
+import axios from "axios";
 import { sessionService } from "service/session.service";
 
 const api = axios.create({

@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useEffect } from "react";
 import { FaWindowClose } from "react-icons/fa";
 
 export interface ModalData {
@@ -17,11 +17,25 @@ const Modal = ({ modalData, setModalData }: Props) => {
 		setModalData({ message: "", success: false, show: false });
 	};
 
+	useEffect(() => {
+		if (modalData.show) {
+			setTimeout(() => {
+				const modal = document.getElementById("modal");
+				modal?.classList.add("animate-slide-out");
+				setTimeout(() => {
+					setModalData({ message: "", show: false, success: false });
+				}, 300);
+			}, 3000);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [modalData]);
+
 	return (
 		<div
+			id="modal"
 			className={`${modalData.success ? "bg-green-500" : "bg-red-500"}
             ${modalData.show ? "block" : "hidden"}
-            w-96 h-20 rounded-xl absolute top-3 left-1/2 -translate-x-1/2 animate-slide-in z-10`}
+            w-96 h-14 rounded-xl absolute top-3 left-1/2 -translate-x-1/2 animate-slide-in z-10`}
 		>
 			<button
 				onClick={handleClose}

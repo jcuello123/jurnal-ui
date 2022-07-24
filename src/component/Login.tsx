@@ -51,6 +51,10 @@ const Login = () => {
 	};
 
 	const handleLogIn = async () => {
+		if (!username || !password) {
+			return;
+		}
+
 		try {
 			const reqBody = {
 				username,
@@ -64,7 +68,7 @@ const Login = () => {
 			}
 		} catch (error) {
 			setModalData({
-				message: "Error logging in.",
+				message: "Unable to log in.",
 				success: false,
 				show: true,
 			});

@@ -4,6 +4,7 @@ import api from "../service/api.service";
 import { sessionService } from "../service/session.service";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import moment from "moment";
+import Modal, { ModalData } from "./Modal";
 
 export interface Log {
 	text: string;
@@ -22,6 +23,11 @@ const LogView = () => {
 	const [index, setCurrentIndex] = useState(0);
 	const [hasMoreData, setHasMoreData] = useState(true);
 	const [isNewLog, setIsNewLog] = useState(false);
+	const [modalData, setModalData] = useState<ModalData>({
+		message: "",
+		success: false,
+		show: false,
+	});
 
 	useEffect(() => {
 		const token = sessionService.getToken();
@@ -45,11 +51,16 @@ const LogView = () => {
 				setLogs(data);
 				setCurrentLog(data[0]);
 			} catch (error) {
-				console.log("Error fetching logs:", error);
+				setModalData({
+					message: "Unable to fetch logs.",
+					success: false,
+					show: true,
+				});
 			}
 		};
 
 		fetchLogs();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() => {
@@ -57,6 +68,7 @@ const LogView = () => {
 		if (index === logs.length - 1) {
 			setOffset(offset + 3);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [index]);
 
 	useEffect(() => {
@@ -74,12 +86,17 @@ const LogView = () => {
 					}
 				}
 			} catch (error) {
-				console.log("Error fetching logs:", error);
+				setModalData({
+					message: "Unable to fetch logs.",
+					success: false,
+					show: true,
+				});
 			}
 		};
 		if (hasMoreData && offset > 0) {
 			fetchLogs();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [offset]);
 
 	useEffect(() => {
@@ -116,50 +133,62 @@ const LogView = () => {
 				setCurrentLog(savedLog);
 				setOffset(0);
 				setHasMoreData(true);
+				setModalData({
+					message: "Saved successfully!",
+					success: true,
+					show: true,
+				});
 			}
 		} catch (error) {
-			console.log("Error saving log:", error);
+			setModalData({
+				message: "Unable to save log.",
+				success: false,
+				show: true,
+			});
 		}
 	};
 
 	return (
-		<div className="flex absolute top-[10%] left-[50%] -translate-x-1/2">
-			<div>
-				<button onClick={handlePreviousLog} className="text-4xl">
-					{<FaAngleLeft />}
-				</button>
-			</div>
-			<div className="flex flex-col justify-center items-center text-white">
-				<div className="flex flex-col items-center">
-					<p className="text-6xl">
-						{currentLog ? currentLog.date : todaysLog.date}
-					</p>
-					{isNewLog && (
-						<textarea
-							className="text-center w-[800px] h-[400px] my-20 text-xl bg-[#282c34] resize-none outline-none"
-							defaultValue={""}
-							onChange={(e) => {
-								currentLog.text = e.target.value;
-							}}
-							autoFocus
-							maxLength={1000}
-							placeholder="Enter a log for today"
-						></textarea>
-					)}
-					{!isNewLog && (
-						<div className="text-center w-[800px] h-[400px] my-20 text-xl">
-							<p>{currentLog && currentLog.text ? currentLog.text : ""}</p>
-						</div>
-					)}
-					{isNewLog && <button onClick={handleSaveLog}>Save</button>}
+		<>
+			<Modal modalData={modalData} setModalData={setModalData} />
+			<div className="flex absolute top-[10%] left-[50%] -translate-x-1/2">
+				<div>
+					<button onClick={handlePreviousLog} className="text-4xl">
+						{<FaAngleLeft />}
+					</button>
+				</div>
+				<div className="flex flex-col justify-center items-center text-white">
+					<div className="flex flex-col items-center">
+						<p className="text-6xl">
+							{currentLog ? currentLog.date : todaysLog.date}
+						</p>
+						{isNewLog && (
+							<textarea
+								className="text-center w-[800px] h-[400px] my-20 text-xl bg-[#282c34] resize-none outline-none"
+								defaultValue={""}
+								onChange={(e) => {
+									currentLog.text = e.target.value;
+								}}
+								autoFocus
+								maxLength={1000}
+								placeholder="Enter a log for today"
+							></textarea>
+						)}
+						{!isNewLog && (
+							<div className="text-center w-[800px] h-[400px] my-20 text-xl">
+								<p>{currentLog && currentLog.text ? currentLog.text : ""}</p>
+							</div>
+						)}
+						{isNewLog && <button onClick={handleSaveLog}>Save</button>}
+					</div>
+				</div>
+				<div>
+					<button onClick={handleNextLog} className="text-4xl">
+						{<FaAngleRight />}
+					</button>
 				</div>
 			</div>
-			<div>
-				<button onClick={handleNextLog} className="text-4xl">
-					{<FaAngleRight />}
-				</button>
-			</div>
-		</div>
+		</>
 	);
 };
 
