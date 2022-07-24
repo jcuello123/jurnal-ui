@@ -20,11 +20,7 @@ const Modal = ({ modalData, setModalData }: Props) => {
 	useEffect(() => {
 		if (modalData.show) {
 			setTimeout(() => {
-				const modal = document.getElementById("modal");
-				modal?.classList.add("animate-slide-out");
-				setTimeout(() => {
-					setModalData({ message: "", show: false, success: false });
-				}, 300);
+				setModalData({ message: "", show: false, success: false });
 			}, 3000);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps

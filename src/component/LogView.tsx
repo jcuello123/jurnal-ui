@@ -11,7 +11,7 @@ export interface Log {
 	date: string;
 }
 
-const LogView = () => {
+const LogView = ({ setUser }) => {
 	const navigate = useNavigate();
 	const [offset, setOffset] = useState(0);
 	const [logs, setLogs] = useState<Log[]>([]);
@@ -37,6 +37,8 @@ const LogView = () => {
 			navigate("/login");
 			return;
 		}
+
+		setUser(username);
 
 		const fetchLogs = async () => {
 			try {
@@ -120,6 +122,10 @@ const LogView = () => {
 	};
 
 	const handleSaveLog = async () => {
+		if (!currentLog.text) {
+			return;
+		}
+
 		try {
 			const reqBody = {
 				text: currentLog.text,
@@ -149,9 +155,9 @@ const LogView = () => {
 	};
 
 	return (
-		<>
+		<div className="flex justify-center">
 			<Modal modalData={modalData} setModalData={setModalData} />
-			<div className="flex absolute top-[10%] left-[50%] -translate-x-1/2">
+			<div className="flex mt-4">
 				<div>
 					<button onClick={handlePreviousLog} className="text-4xl">
 						{<FaAngleLeft />}
@@ -188,7 +194,7 @@ const LogView = () => {
 					</button>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 };
 

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../service/api.service";
 import { sessionService } from "../service/session.service";
@@ -31,7 +32,7 @@ const Input = ({ type, placeholder, onChange }) => {
 	);
 };
 
-const Login = () => {
+const Login = ({ setUser }) => {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [modalData, setModalData] = useState<ModalData>({
@@ -39,6 +40,11 @@ const Login = () => {
 		success: false,
 		show: false,
 	});
+
+	useEffect(() => {
+		sessionService.clear();
+		setUser(null);
+	}, []);
 
 	const navigate = useNavigate();
 
@@ -64,6 +70,7 @@ const Login = () => {
 			if (response?.status === 200) {
 				sessionService.setToken(response.data);
 				sessionService.setUsername(username);
+				setUser(username);
 				navigate("/");
 			}
 		} catch (error) {
