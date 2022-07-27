@@ -12,7 +12,7 @@ const Header = ({ user, setUser }) => {
 	};
 
 	return (
-		<div className="flex items-center justify-between min-h-[75px] p-1">
+		<div className="flex items-center justify-between min-h-[75px] p-1 text-[#F2E9E4]">
 			<div className="flex items-center">
 				<img
 					className="rounded-[10%]"
@@ -20,10 +20,10 @@ const Header = ({ user, setUser }) => {
 					width={85}
 					alt="logo"
 				/>
-				<h1 className="text-4xl text-white">jurnal</h1>
+				<h1 className="text-4xl">jurnal</h1>
 			</div>
 			{user && (
-				<div className="text-white flex gap-2">
+				<div className="flex gap-2">
 					<p>{user} |</p>
 					<button onClick={handleLogOut} className="hover:text-cyan-400">
 						Log out

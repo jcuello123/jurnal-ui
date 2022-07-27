@@ -14,7 +14,7 @@ const Button = ({ text, onClick }: ButtonProps) => {
 	return (
 		<button
 			onClick={onClick}
-			className="border border-slate-900 p-2 rounded-xl hover:bg-violet-300"
+			className="border-2 border-slate-900 p-2 rounded-xl hover:bg-[#22223B] text-[#F2E9E4]"
 		>
 			{text}
 		</button>
@@ -86,8 +86,8 @@ const Login = ({ setUser }) => {
 		<>
 			<Modal modalData={modalData} setModalData={setModalData} />
 			<div
-				className="w-80 h-80 bg-violet-400 top-[50%] left-[50%] -translate-x-1/2
-                       -translate-y-1/2 absolute rounded-lg"
+				className="w-80 h-80 bg-[#4A4E69] top-[50%] left-[50%] -translate-x-1/2
+                       -translate-y-1/2 absolute rounded-lg shadow-custom"
 			>
 				<div className="flex flex-col justify-center items-center h-full gap-5">
 					<Input

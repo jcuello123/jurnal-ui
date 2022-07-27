@@ -5,6 +5,15 @@ module.exports = {
 	content: ["./src/**/*.{js,jsx,ts,tsx}"],
 	theme: {
 		extend: {
+			backgroundImage: {
+				"to-right": "linear-gradient(to right, white 10px, transparent 10px)",
+				"to-left": "linear-gradient(to left, white 10px, transparent 10px)",
+				repeat:
+					"repeating-linear-gradient(white, white 30px, #ccc 30px, #ccc 31px, white 31px)",
+			},
+			boxShadow: {
+				custom: "0px 8px 16px 0px rgba(0,0,0,0.75);",
+			},
 			animation: {
 				"slide-in": "slide-in 0.5s ease-in-out",
 			},

@@ -46,6 +46,8 @@ const LogView = ({ setUser }) => {
 				const response = await api.post("/logs", reqBody);
 				const data: Log[] = response.data || [];
 
+				console.log(data);
+
 				if (data.length === 0 || data[0].date !== todaysLog.date) {
 					data.unshift(todaysLog);
 				}
@@ -103,11 +105,12 @@ const LogView = ({ setUser }) => {
 
 	useEffect(() => {
 		setIsNewLog(
-			currentLog &&
-				currentLog.date === moment().format("YYYY-MM-DD") &&
-				!currentLog.text
+			todaysLog &&
+				currentLog &&
+				currentLog.date === todaysLog.date &&
+				!todaysLog.text
 		);
-	}, [currentLog]);
+	}, [todaysLog]);
 
 	const handlePreviousLog = () => {
 		if (index < logs.length - 1) {
@@ -122,14 +125,14 @@ const LogView = ({ setUser }) => {
 	};
 
 	const handleSaveLog = async () => {
-		if (!currentLog.text) {
+		if (!todaysLog.text) {
 			return;
 		}
 
 		try {
 			const reqBody = {
-				text: currentLog.text,
-				date: currentLog.date,
+				text: todaysLog.text,
+				date: todaysLog.date,
 				username: sessionService.getUsername(),
 			};
 
@@ -155,7 +158,7 @@ const LogView = ({ setUser }) => {
 	};
 
 	return (
-		<div className="flex justify-center">
+		<div className="flex justify-center text-[#F2E9E4]">
 			<Modal modalData={modalData} setModalData={setModalData} />
 			<div className="flex mt-4">
 				<div>
@@ -163,17 +166,19 @@ const LogView = ({ setUser }) => {
 						{<FaAngleLeft />}
 					</button>
 				</div>
-				<div className="flex flex-col justify-center items-center text-white">
+				<div className="flex flex-col justify-center items-center">
 					<div className="flex flex-col items-center">
-						<p className="text-6xl">
+						<p className="text-6xl bg-[#4A4E69] rounded-md p-3">
 							{currentLog ? currentLog.date : todaysLog.date}
 						</p>
 						{isNewLog && (
 							<textarea
-								className="text-center w-[800px] h-[400px] my-20 text-xl bg-[#282c34] resize-none outline-none"
+								className="text-center w-[800px] h-[400px] my-20 text-xl bg-[#22223B]
+									       resize-none outline-none attachment leading-8 p-8 bg-to-right
+										   bg-to-left bg-repeat rounded-md text-[#22223B]"
 								defaultValue={""}
 								onChange={(e) => {
-									currentLog.text = e.target.value;
+									todaysLog.text = e.target.value;
 								}}
 								autoFocus
 								maxLength={1000}
@@ -182,7 +187,13 @@ const LogView = ({ setUser }) => {
 						)}
 						{!isNewLog && (
 							<div className="text-center w-[800px] h-[400px] my-20 text-xl">
-								<p>{currentLog && currentLog.text ? currentLog.text : ""}</p>
+								<textarea
+									className="text-center w-[800px] h-[400px] text-xl bg-[#22223B]
+									       resize-none outline-none attachment leading-8 p-8 bg-to-right
+										   bg-to-left bg-repeat rounded-md text-[#22223B]"
+									value={currentLog && currentLog.text ? currentLog.text : ""}
+									readOnly
+								></textarea>
 							</div>
 						)}
 						{isNewLog && <button onClick={handleSaveLog}>Save</button>}
