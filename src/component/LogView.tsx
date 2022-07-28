@@ -11,18 +11,23 @@ export interface Log {
 	date: string;
 }
 
+const emptyLog: Log = {
+	text: "",
+	date: moment().format("YYYY-MM-DD"),
+};
+
 const LogView = ({ setUser }) => {
 	const navigate = useNavigate();
 	const [offset, setOffset] = useState(0);
 	const [logs, setLogs] = useState<Log[]>([]);
-	const todaysLog: Log = {
-		text: "",
-		date: moment().format("YYYY-MM-DD"),
-	};
-	const [currentLog, setCurrentLog] = useState<Log>(todaysLog);
 	const [index, setCurrentIndex] = useState(0);
 	const [hasMoreData, setHasMoreData] = useState(true);
+	const [shouldFetch, setShouldFetch] = useState(true);
 	const [isNewLog, setIsNewLog] = useState(false);
+	const [displayText, setDisplayText] = useState("");
+	const [currentLog, setCurrentLog] = useState(emptyLog);
+	const [todaysLog, setTodaysLog] = useState(emptyLog);
+
 	const [modalData, setModalData] = useState<ModalData>({
 		message: "",
 		success: false,
@@ -41,31 +46,32 @@ const LogView = ({ setUser }) => {
 		setUser(username);
 
 		const fetchLogs = async () => {
-			try {
-				const reqBody = { offset };
-				const response = await api.post("/logs", reqBody);
-				const data: Log[] = response.data || [];
+			if (shouldFetch) {
+				try {
+					const reqBody = { offset };
+					const response = await api.post("/logs", reqBody);
+					const data: Log[] = response.data || [];
 
-				console.log(data);
+					if (data.length === 0 || data[0].date !== todaysLog.date) {
+						data.unshift(todaysLog);
+					}
 
-				if (data.length === 0 || data[0].date !== todaysLog.date) {
-					data.unshift(todaysLog);
+					setLogs(data);
+					setCurrentLog(data[0]);
+				} catch (error) {
+					setModalData({
+						message: "Unable to fetch logs.",
+						success: false,
+						show: true,
+					});
 				}
-
-				setLogs(data);
-				setCurrentLog(data[0]);
-			} catch (error) {
-				setModalData({
-					message: "Unable to fetch logs.",
-					success: false,
-					show: true,
-				});
+				setShouldFetch(false);
 			}
 		};
 
 		fetchLogs();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [shouldFetch]);
 
 	useEffect(() => {
 		setCurrentLog(logs[index]);
@@ -104,22 +110,25 @@ const LogView = ({ setUser }) => {
 	}, [offset]);
 
 	useEffect(() => {
-		setIsNewLog(
-			todaysLog &&
-				currentLog &&
-				currentLog.date === todaysLog.date &&
-				!todaysLog.text
-		);
+		const newLog = currentLog?.date === todaysLog?.date && !currentLog?.text;
+		setIsNewLog(newLog);
+		setDisplayText(currentLog?.text);
+	}, [currentLog]);
+
+	useEffect(() => {
+		setDisplayText(todaysLog?.text);
 	}, [todaysLog]);
 
 	const handlePreviousLog = () => {
 		if (index < logs.length - 1) {
+			setTodaysLog(emptyLog);
 			setCurrentIndex(index + 1);
 		}
 	};
 
 	const handleNextLog = () => {
 		if (index >= 1) {
+			setTodaysLog(emptyLog);
 			setCurrentIndex(index - 1);
 		}
 	};
@@ -138,8 +147,6 @@ const LogView = ({ setUser }) => {
 
 			const response = await api.post("/logs/save", reqBody);
 			if (response.data) {
-				const savedLog = response.data;
-				setCurrentLog(savedLog);
 				setOffset(0);
 				setHasMoreData(true);
 				setModalData({
@@ -147,6 +154,7 @@ const LogView = ({ setUser }) => {
 					success: true,
 					show: true,
 				});
+				setShouldFetch(true);
 			}
 		} catch (error) {
 			setModalData({
@@ -169,33 +177,25 @@ const LogView = ({ setUser }) => {
 				<div className="flex flex-col justify-center items-center">
 					<div className="flex flex-col items-center">
 						<p className="text-6xl bg-[#4A4E69] rounded-md p-3">
-							{currentLog ? currentLog.date : todaysLog.date}
+							{currentLog?.date}
 						</p>
-						{isNewLog && (
-							<textarea
-								className="text-center w-[800px] h-[400px] my-20 text-xl bg-[#22223B]
+						<textarea
+							className="text-center w-[800px] h-[400px] my-20 text-xl bg-[#22223B]
 									       resize-none outline-none attachment leading-8 p-8 bg-to-right
 										   bg-to-left bg-repeat rounded-md text-[#22223B]"
-								defaultValue={""}
-								onChange={(e) => {
-									todaysLog.text = e.target.value;
-								}}
-								autoFocus
-								maxLength={1000}
-								placeholder="Enter a log for today"
-							></textarea>
-						)}
-						{!isNewLog && (
-							<div className="text-center w-[800px] h-[400px] my-20 text-xl">
-								<textarea
-									className="text-center w-[800px] h-[400px] text-xl bg-[#22223B]
-									       resize-none outline-none attachment leading-8 p-8 bg-to-right
-										   bg-to-left bg-repeat rounded-md text-[#22223B]"
-									value={currentLog && currentLog.text ? currentLog.text : ""}
-									readOnly
-								></textarea>
-							</div>
-						)}
+							value={displayText}
+							onChange={(e) => {
+								const log: Log = {
+									date: todaysLog.date,
+									text: e.target.value,
+								};
+								setTodaysLog(log);
+							}}
+							autoFocus
+							readOnly={!isNewLog}
+							maxLength={1000}
+							placeholder="Enter a log for today"
+						></textarea>
 						{isNewLog && <button onClick={handleSaveLog}>Save</button>}
 					</div>
 				</div>
