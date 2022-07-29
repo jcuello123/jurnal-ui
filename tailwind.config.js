@@ -6,8 +6,6 @@ module.exports = {
 	theme: {
 		extend: {
 			backgroundImage: {
-				"to-right": "linear-gradient(to right, white 10px, transparent 10px)",
-				"to-left": "linear-gradient(to left, white 10px, transparent 10px)",
 				repeat:
 					"repeating-linear-gradient(white, white 30px, #ccc 30px, #ccc 31px, white 31px)",
 			},

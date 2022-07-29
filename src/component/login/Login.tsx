@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../service/api.service";
-import { sessionService } from "../service/session.service";
-import Modal, { ModalData } from "./Modal";
+import api from "../../service/api.service";
+import { sessionService } from "../../service/session.service";
+import { setUser } from "../../slice/userSlice";
+import Modal, { ModalData } from "../modal/Modal";
 
 interface ButtonProps {
 	text: string;
@@ -32,7 +34,8 @@ const Input = ({ type, placeholder, onChange }) => {
 	);
 };
 
-const Login = ({ setUser }) => {
+const Login = () => {
+	const dispatch = useDispatch();
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [modalData, setModalData] = useState<ModalData>({
@@ -43,7 +46,6 @@ const Login = ({ setUser }) => {
 
 	useEffect(() => {
 		sessionService.clear();
-		setUser(null);
 	}, []);
 
 	const navigate = useNavigate();
@@ -68,9 +70,10 @@ const Login = ({ setUser }) => {
 			};
 			const response = await api.post("/login", reqBody);
 			if (response?.status === 200) {
+				sessionService.clear();
 				sessionService.setToken(response.data);
 				sessionService.setUsername(username);
-				setUser(username);
+				dispatch(setUser(username));
 				navigate("/");
 			}
 		} catch (error) {

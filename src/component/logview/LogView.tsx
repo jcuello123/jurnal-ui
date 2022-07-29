@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../service/api.service";
-import { sessionService } from "../service/session.service";
+import api from "../../service/api.service";
+import { sessionService } from "../../service/session.service";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import moment from "moment";
-import Modal, { ModalData } from "./Modal";
+import Modal, { ModalData } from "../modal/Modal";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import { setUser } from "../../slice/userSlice";
 
 export interface Log {
 	text: string;
@@ -16,7 +19,7 @@ const emptyLog: Log = {
 	date: moment().format("YYYY-MM-DD"),
 };
 
-const LogView = ({ setUser }) => {
+const LogView = () => {
 	const navigate = useNavigate();
 	const [offset, setOffset] = useState(0);
 	const [logs, setLogs] = useState<Log[]>([]);
@@ -27,6 +30,8 @@ const LogView = ({ setUser }) => {
 	const [displayText, setDisplayText] = useState("");
 	const [currentLog, setCurrentLog] = useState(emptyLog);
 	const [todaysLog, setTodaysLog] = useState(emptyLog);
+	const dispatch = useDispatch();
+	const user = useSelector((state: RootState) => state.user);
 
 	const [modalData, setModalData] = useState<ModalData>({
 		message: "",
@@ -43,7 +48,7 @@ const LogView = ({ setUser }) => {
 			return;
 		}
 
-		setUser(username);
+		dispatch(setUser(username));
 
 		const fetchLogs = async () => {
 			if (shouldFetch) {
@@ -176,13 +181,13 @@ const LogView = ({ setUser }) => {
 				</div>
 				<div className="flex flex-col justify-center items-center">
 					<div className="flex flex-col items-center">
-						<p className="text-6xl bg-[#4A4E69] rounded-md p-3">
+						<p className="text-6xl bg-[#4A4E69] rounded-md p-3 shadow-2xl">
 							{currentLog?.date}
 						</p>
 						<textarea
 							className="text-center w-[800px] h-[400px] my-20 text-xl bg-[#22223B]
-									       resize-none outline-none attachment leading-8 p-8 bg-to-right
-										   bg-to-left bg-repeat rounded-md text-[#22223B]"
+									    resize-none outline-none attachment leading-8 p-8
+										bg-repeat rounded-md text-[#22223B] shadow-2xl"
 							value={displayText}
 							onChange={(e) => {
 								const log: Log = {

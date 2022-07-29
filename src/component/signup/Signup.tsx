@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../service/api.service";
-import Modal, { ModalData } from "./Modal";
+import api from "../../service/api.service";
+import Modal, { ModalData } from "../modal/Modal";
 
 const Signup = () => {
 	const [username, setUsername] = useState("");
@@ -30,7 +30,20 @@ const Signup = () => {
 			};
 			const response = await api.post("/signup", reqBody);
 			if (response.data) {
-				navigate("/login");
+				setUsername("");
+				setPassword("");
+				setConfirmPassword("");
+				setModalData({
+					message: "Account created!",
+					show: true,
+					success: true,
+				});
+			} else {
+				setModalData({
+					message: "Unable to sign up.",
+					success: false,
+					show: true,
+				});
 			}
 		} catch (error) {
 			setModalData({
@@ -53,18 +66,21 @@ const Signup = () => {
 						className="rounded-lg p-2 focus:outline-none"
 						placeholder="Username"
 						type="text"
+						value={username}
 						onChange={(e) => setUsername(e.target.value)}
 					/>
 					<input
 						className="rounded-lg p-2 focus:outline-none"
 						placeholder="Password"
 						type="password"
+						value={password}
 						onChange={(e) => setPassword(e.target.value)}
 					/>
 					<input
 						className="rounded-lg p-2 focus:outline-none"
 						placeholder="Confirm password"
 						type="password"
+						value={confirmPassword}
 						onChange={(e) => setConfirmPassword(e.target.value)}
 					/>
 					<div className="flex flex-col gap-2">
@@ -75,7 +91,9 @@ const Signup = () => {
 							Sign Up
 						</button>
 						<Link to="/login">
-							<p className="hover:text-teal-300">Back to Login</p>
+							<p className="hover:text-[#C9ADA7] text-[#F2E9E4]">
+								Back to Login
+							</p>
 						</Link>
 					</div>
 				</div>

@@ -1,20 +1,17 @@
-import { useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-import Header from "./component/Header";
-import Login from "./component/Login";
-import LogView from "./component/LogView";
-import Signup from "./component/Signup";
+import Header from "./component/header/Header";
+import Login from "./component/login/Login";
+import LogView from "./component/logview/LogView";
+import Signup from "./component/signup/Signup";
 
 function App() {
-	const [user, setUser] = useState(null);
-
 	return (
 		<BrowserRouter>
-			<Header user={user} setUser={setUser} />
+			<Header />
 			<Routes>
-				<Route path="/" element={<LogView setUser={setUser} />} />
-				<Route path="/login" element={<Login setUser={setUser} />} />
+				<Route path="/" element={<LogView />} />
+				<Route path="/login" element={<Login />} />
 				<Route path="/signup" element={<Signup />} />
 			</Routes>
 		</BrowserRouter>

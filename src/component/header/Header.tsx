@@ -1,13 +1,18 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { sessionService } from "../service/session.service";
+import { sessionService } from "../../service/session.service";
+import { setUser } from "../../slice/userSlice";
+import { RootState } from "../../store/store";
 
-const Header = ({ user, setUser }) => {
+const Header = () => {
+	const user = useSelector((state: RootState) => state.user);
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
 
 	const handleLogOut = () => {
 		sessionService.clear();
-		setUser(null);
+		dispatch(setUser(""));
 		navigate("/login");
 	};
 
@@ -22,10 +27,10 @@ const Header = ({ user, setUser }) => {
 				/>
 				<h1 className="text-4xl">jurnal</h1>
 			</div>
-			{user && (
+			{user.username && (
 				<div className="flex gap-2">
-					<p>{user} |</p>
-					<button onClick={handleLogOut} className="hover:text-cyan-400">
+					<p>{user.username} |</p>
+					<button onClick={handleLogOut} className="hover:text-[#C9ADA7]">
 						Log out
 					</button>
 				</div>
