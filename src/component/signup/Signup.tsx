@@ -58,7 +58,7 @@ const Signup = () => {
 		<>
 			<Modal modalData={modalData} setModalData={setModalData} />
 			<div
-				className="w-80 h-80 bg-[#284b63] top-[50%] left-[50%] -translate-x-1/2
+				className="w-80 h-80 bg-[#353535] top-[50%] left-[50%] -translate-x-1/2
 				-translate-y-1/2 absolute rounded-lg shadow-custom"
 			>
 				<div className="flex flex-col justify-center items-center h-full gap-5">
@@ -86,12 +86,14 @@ const Signup = () => {
 					<div className="flex flex-col gap-2">
 						<button
 							onClick={handleSignUp}
-							className="border-2 bg-white border-slate-900 p-2 rounded-xl hover:bg-[#d9d9d9] text-[#284b63]"
+							className="bg-[#FFFFFC] p-2 rounded-xl hover:bg-[#d9d9d9]"
 						>
 							Sign Up
 						</button>
 						<Link to="/login">
-							<p className="hover:text-[#d9d9d9] ">Back to Login</p>
+							<p className="text-[#fffffc] hover:text-[#9BF6FF] ">
+								Back to Login
+							</p>
 						</Link>
 					</div>
 				</div>

@@ -31,7 +31,18 @@ const LogView = () => {
 	const [currentLog, setCurrentLog] = useState(emptyLog);
 	const [todaysLog, setTodaysLog] = useState(emptyLog);
 	const dispatch = useDispatch();
-	const user = useSelector((state: RootState) => state.user);
+	const [paperColor, setPaperColor] = useState("bg-paper-white");
+	const paperColors = [
+		"bg-paper-white",
+		"bg-paper-blue",
+		"bg-paper-red",
+		"bg-paper-orange",
+		"bg-paper-yellow",
+		"bg-paper-green",
+		"bg-paper-cyan",
+		"bg-paper-purple",
+		"bg-paper-pink",
+	];
 
 	const [modalData, setModalData] = useState<ModalData>({
 		message: "",
@@ -48,6 +59,7 @@ const LogView = () => {
 			return;
 		}
 
+		handleRandomPaperColor();
 		dispatch(setUser(username));
 
 		const fetchLogs = async () => {
@@ -126,6 +138,7 @@ const LogView = () => {
 
 	const handlePreviousLog = () => {
 		if (index < logs.length - 1) {
+			handleRandomPaperColor();
 			setTodaysLog(emptyLog);
 			setCurrentIndex(index + 1);
 		}
@@ -133,6 +146,7 @@ const LogView = () => {
 
 	const handleNextLog = () => {
 		if (index >= 1) {
+			handleRandomPaperColor();
 			setTodaysLog(emptyLog);
 			setCurrentIndex(index - 1);
 		}
@@ -170,27 +184,30 @@ const LogView = () => {
 		}
 	};
 
+	const handleRandomPaperColor = () => {
+		const idx = Math.floor(Math.random() * paperColors.length);
+		setPaperColor(paperColors[idx]);
+		console.log("idx:", idx, paperColors[idx]);
+	};
+
 	return (
 		<div className="flex justify-center">
 			<Modal modalData={modalData} setModalData={setModalData} />
 			<div className="flex mt-4">
 				<div>
-					<button
-						onClick={handlePreviousLog}
-						className="text-4xl text-[#353535]"
-					>
+					<button onClick={handlePreviousLog} className="text-4xl">
 						{<FaAngleLeft />}
 					</button>
 				</div>
 				<div className="flex flex-col justify-center items-center">
 					<div className="flex flex-col items-center">
-						<p className="text-6xl bg-[#353535] rounded-md p-3 shadow-2xl">
+						<p className="text-6xl bg-[#353535] text-[#fffffc] rounded-md p-3 shadow-2xl">
 							{currentLog?.date}
 						</p>
 						<textarea
-							className="text-center w-[800px] h-[450px] my-20 text-xl bg-[#22223B]
+							className={`${paperColor} text-center w-[800px] h-[450px] my-20 text-xl
 									    resize-none outline-none attachment leading-8 p-8
-										bg-repeat rounded-md text-[#353535] shadow-2xl border"
+										ggrounded-md shadow-2xl border-2 rounded-md border-black placeholder:text-black`}
 							value={displayText}
 							onChange={(e) => {
 								const log: Log = {
@@ -206,7 +223,7 @@ const LogView = () => {
 						></textarea>
 						{isNewLog && (
 							<button
-								className="bg-[#353535] p-2 rounded-md"
+								className="bg-[#353535] text-[#fffffc] p-2 rounded-md"
 								onClick={handleSaveLog}
 							>
 								Save
@@ -215,7 +232,7 @@ const LogView = () => {
 					</div>
 				</div>
 				<div>
-					<button onClick={handleNextLog} className="text-4xl text-[#353535]">
+					<button onClick={handleNextLog} className="text-4xl">
 						{<FaAngleRight />}
 					</button>
 				</div>

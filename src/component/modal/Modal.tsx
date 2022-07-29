@@ -29,17 +29,14 @@ const Modal = ({ modalData, setModalData }: Props) => {
 	return (
 		<div
 			id="modal"
-			className={`${modalData.success ? "bg-[#43aa8b]" : "bg-[#f94144]"}
+			className={`${modalData.success ? "bg-[#CAFFBF]" : "bg-[#FFADAD]"}
             ${modalData.show ? "block" : "hidden"}
             w-96 h-14 rounded-xl absolute top-3 left-1/2 -translate-x-1/2 animate-slide-in z-10`}
 		>
-			<button
-				onClick={handleClose}
-				className="absolute right-2 text-white top-1"
-			>
+			<button onClick={handleClose} className="absolute right-2 top-1">
 				<FaWindowClose />
 			</button>
-			<p className="text-white absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2">
+			<p className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2">
 				{modalData.message}
 			</p>
 		</div>
