@@ -29,7 +29,7 @@ const Modal = ({ modalData, setModalData }: Props) => {
 	return (
 		<div
 			id="modal"
-			className={`${modalData.success ? "bg-green-500" : "bg-red-500"}
+			className={`${modalData.success ? "bg-[#43aa8b]" : "bg-[#f94144]"}
             ${modalData.show ? "block" : "hidden"}
             w-96 h-14 rounded-xl absolute top-3 left-1/2 -translate-x-1/2 animate-slide-in z-10`}
 		>

@@ -171,23 +171,26 @@ const LogView = () => {
 	};
 
 	return (
-		<div className="flex justify-center text-[#F2E9E4]">
+		<div className="flex justify-center">
 			<Modal modalData={modalData} setModalData={setModalData} />
 			<div className="flex mt-4">
 				<div>
-					<button onClick={handlePreviousLog} className="text-4xl">
+					<button
+						onClick={handlePreviousLog}
+						className="text-4xl text-[#353535]"
+					>
 						{<FaAngleLeft />}
 					</button>
 				</div>
 				<div className="flex flex-col justify-center items-center">
 					<div className="flex flex-col items-center">
-						<p className="text-6xl bg-[#4A4E69] rounded-md p-3 shadow-2xl">
+						<p className="text-6xl bg-[#353535] rounded-md p-3 shadow-2xl">
 							{currentLog?.date}
 						</p>
 						<textarea
-							className="text-center w-[800px] h-[400px] my-20 text-xl bg-[#22223B]
+							className="text-center w-[800px] h-[450px] my-20 text-xl bg-[#22223B]
 									    resize-none outline-none attachment leading-8 p-8
-										bg-repeat rounded-md text-[#22223B] shadow-2xl"
+										bg-repeat rounded-md text-[#353535] shadow-2xl border"
 							value={displayText}
 							onChange={(e) => {
 								const log: Log = {
@@ -201,11 +204,18 @@ const LogView = () => {
 							maxLength={1000}
 							placeholder="Enter a log for today"
 						></textarea>
-						{isNewLog && <button onClick={handleSaveLog}>Save</button>}
+						{isNewLog && (
+							<button
+								className="bg-[#353535] p-2 rounded-md"
+								onClick={handleSaveLog}
+							>
+								Save
+							</button>
+						)}
 					</div>
 				</div>
 				<div>
-					<button onClick={handleNextLog} className="text-4xl">
+					<button onClick={handleNextLog} className="text-4xl text-[#353535]">
 						{<FaAngleRight />}
 					</button>
 				</div>

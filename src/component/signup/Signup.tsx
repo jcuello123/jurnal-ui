@@ -28,7 +28,7 @@ const Signup = () => {
 				username,
 				password,
 			};
-			const response = await api.post("/signup", reqBody);
+			const response: any = await api.post("/signup", reqBody);
 			if (response.data) {
 				setUsername("");
 				setPassword("");
@@ -38,9 +38,9 @@ const Signup = () => {
 					show: true,
 					success: true,
 				});
-			} else {
+			} else if (response?.response?.status === 409) {
 				setModalData({
-					message: "Unable to sign up.",
+					message: "User already exists.",
 					success: false,
 					show: true,
 				});
@@ -58,26 +58,26 @@ const Signup = () => {
 		<>
 			<Modal modalData={modalData} setModalData={setModalData} />
 			<div
-				className="w-80 h-80 bg-[#4A4E69] top-[50%] left-[50%] -translate-x-1/2
+				className="w-80 h-80 bg-[#284b63] top-[50%] left-[50%] -translate-x-1/2
 				-translate-y-1/2 absolute rounded-lg shadow-custom"
 			>
 				<div className="flex flex-col justify-center items-center h-full gap-5">
 					<input
-						className="rounded-lg p-2 focus:outline-none"
+						className="rounded-lg p-2 focus:outline-none text-black"
 						placeholder="Username"
 						type="text"
 						value={username}
 						onChange={(e) => setUsername(e.target.value)}
 					/>
 					<input
-						className="rounded-lg p-2 focus:outline-none"
+						className="rounded-lg p-2 focus:outline-none text-black"
 						placeholder="Password"
 						type="password"
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
 					/>
 					<input
-						className="rounded-lg p-2 focus:outline-none"
+						className="rounded-lg p-2 focus:outline-none text-black"
 						placeholder="Confirm password"
 						type="password"
 						value={confirmPassword}
@@ -86,14 +86,12 @@ const Signup = () => {
 					<div className="flex flex-col gap-2">
 						<button
 							onClick={handleSignUp}
-							className="border-2 border-slate-900 p-2 rounded-xl hover:bg-[#22223B] text-[#F2E9E4]"
+							className="border-2 bg-white border-slate-900 p-2 rounded-xl hover:bg-[#d9d9d9] text-[#284b63]"
 						>
 							Sign Up
 						</button>
 						<Link to="/login">
-							<p className="hover:text-[#C9ADA7] text-[#F2E9E4]">
-								Back to Login
-							</p>
+							<p className="hover:text-[#d9d9d9] ">Back to Login</p>
 						</Link>
 					</div>
 				</div>
